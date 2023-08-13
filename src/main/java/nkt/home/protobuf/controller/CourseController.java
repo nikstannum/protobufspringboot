@@ -1,8 +1,8 @@
 package nkt.home.protobuf.controller;
 
 import java.net.URI;
-import nkt.home.protobuf.generated.CourseProto.Course;
-import nkt.home.protobuf.repository.CourseRepository;
+import nkt.home.protobuf.generated.CourseProto.CourseDto;
+import nkt.home.protobuf.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +17,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
-    private final CourseRepository repository;
+    private final CourseService service;
 
-    public CourseController(CourseRepository repository) {
-        this.repository = repository;
+    public CourseController(CourseService service) {
+        this.service = service;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable Integer id) {
-        Course course = repository.getCourse(id);
+    public ResponseEntity<CourseDto> getCourseById(@PathVariable Integer id) {
+        CourseDto course = service.getById(id);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(course);
     }
 
@@ -36,19 +36,19 @@ public class CourseController {
     В данном методе объект класса Course содержит id, но логика присваивания id содержится в репозитории и возложена на счетчик.
      */
     @PostMapping
-    public ResponseEntity<Course> save(@RequestBody Course course) {
-        Course created = repository.addCourse(course);
+    public ResponseEntity<CourseDto> save(@RequestBody CourseDto dto) {
+        CourseDto created = service.save(dto);
         return buildResponseCreated(created);
     }
 
-    private ResponseEntity<Course> buildResponseCreated(Course created) {
+    private ResponseEntity<CourseDto> buildResponseCreated(CourseDto created) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(getLocation(created))
                 .contentType(MediaType.APPLICATION_JSON) // нужно явно указать тип контента
                 .body(created);
     }
 
-    private URI getLocation(Course created) {
+    private URI getLocation(CourseDto created) {
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("courses/{id}")
                 .buildAndExpand(created.getId())
                 .toUri();

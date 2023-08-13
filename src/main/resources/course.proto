@@ -3,23 +3,26 @@ package nkt;
 option java_package = "nkt.home.protobuf.generated";
 option java_outer_classname = "CourseProto";
 
-message Course {
+message CourseDto {
   int32 id = 1;
   string course_name = 2;
-  repeated Student student = 3;
+  repeated StudentDto students = 3;
 }
-message Student {
+
+message StudentDto {
   int32 id = 1;
   string first_name = 2;
   string last_name = 3;
   string email = 4;
-  repeated PhoneNumber phone = 5;
-  message PhoneNumber {
+  repeated PhoneNumberDto phones = 5;
+  message PhoneNumberDto {
     string number = 1;
-    PhoneType type = 2;
+    PhoneTypeDto type = 2;
   }
-  enum PhoneType {
-    MOBILE = 0;
-    LANDLINE = 1;
+
+  enum PhoneTypeDto {
+    UNSPECIFIED = 0;
+    MOBILE = 1;
+    LANDLINE = 2;
   }
 }

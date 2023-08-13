@@ -1,32 +1,92 @@
-### Demo application for using proto files (On the example of the tutorial https://www.baeldung.com/spring-rest-api-with-protocol-buffers)
+### This commit describes how to use proto files to generate DTOs that are used as web-interface entities. An example of POJO <---> DTO mapping is also given. Note that the "manual" mapping code is commented out. The main interest is mapping using the MapStruct library.
+
 #### How to use:
-##### 1. Download the protoc compiler to compile .proto files. Add it to environment variables. Run the protoc command on the command line to verify that the compiler is working.
-You can download the compiler for your OS at the URL https://github.com/protocolbuffers/protobuf/releases
-##### 2. Create a course.proto file in the resources folder with a description of the required class fields.
-##### 3. Compile the course.proto file with the command 'protoc --java_out=src/main/java src/main/resources/course.proto'.
-The command parameters are the directory (src/main/java) where the generated class will be placed and the path to the course.proto file.
-Note that the package for the generated class is defined in the course.proto file.
-You can also compile the proto file with the command 'protoc --proto_path=src/main/resources --java_out=src/main/java course.proto', in which the directory where the proto file is located is specified as the first argument, and in as the second, the destination directory to contain the generated class. Here, too, the package for the generated class is taken from the description of the course.proto file.
-##### 4. Description of dependencies in the project:
-implementation 'com.google.protobuf:protobuf-java:3.24.0' - needed to work with protobuf objects
-implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4' - needed to work with the JSON representation of protobuf objects.
-##### 5. Note that by default the controller serializes the object to application/x-protobuf format (see https://docs.spring.io/spring-framework/docs/current/javadoc-api/org /springframework/http/converter/protobuf/ProtobufHttpMessageConverter.html). In order to serialize an object to JSON, you need to register a ProtobufHttpMessageConverter as a bean and add the 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4' dependency that supports object serialization to JSON. After that, the contentType must be explicitly specified in the controller.
 
+##### 1. Modify the description of the proto file slightly to be used as a DTO. Note that only the field names that match the field names of the POJO classes have been changed.
 
+Also note that the value UNSPECIFIED has been added to the PhoneTypeDto enum. This is done to avoid confusion if the
+client fails to send the request body. For example, earlier, if you send a POST request with a body like this
+{
+"course_name": "REST with Spring",
+"students": [
+{
+"id": 1,
+"first_name": "John",
+"last_name": "Doe",
+"email": "johndoe@example.com",
+"phones": [
+{
+"number": "555-1234"
+}
+]
+},
+{
+"id": 2,
+"first_name": "Jane",
+"last_name": "Doe",
+"email": "janedoe@example.com",
+"phones": [
+{
+"number": "555-5678",
+"type": "LANDLINE"
+}
+]
+}
+]
+}
+the student with id = 1 will have MOBILE installed by default (you can go back to this point and make sure). Now, if you
+do not specify the phone type, an exception will be thrown (see https://protobuf.dev/programming-guides/style/#enums)
 
-### Демонстрационное приложение для использования прото-файлов
+##### 2. The mechanism for compiling and generating classes based on proto-files remains unchanged and is described in the README.MD of the previous commit.
+
+##### 3. Pay attention to the fact that in the generated classes the words 'list' (students --> studentsList) are added to the names of the fields in the proto-files, which are collections (in this case, List).
+
+##### 4. Pay attention to the comments to the code, which affect the nuances of the generated classes with the MapStruct library.
+
+### В этом коммите описано использование прото-файлов для генерации DTO, которые используются в качестве сущностей веб-интерфейса. Также приводится пример маппинга POJO <---> DTO. Обратите внимание, что код маппинг "вручную" закомментирован. Основной интерес представляет маппинг с использованием библиотеки MapStruct.
+
 #### Порядок использования:
-##### 1. Скачать компилятор protoc для компиляции файлов .proto. Добавить его в переменные среды. Исполнить команду protoc в командной строке, чтобы убедиться в работоспособности компилятора.
-Скачать компилятор для Вашей ОС можно по URL https://github.com/protocolbuffers/protobuf/releases
-##### 2. Создать файл course.proto в папке resources с описанием полей требуемого класса.
-##### 3. Скомпилировать файл course.proto с помощью команды 'protoc --java_out=src/main/java src/main/resources/course.proto'.
-Параметрами команды является директория (src/main/java), куда будет помещен сгенерированный класс и путь к файлу course.proto.
-Обратите внимание, что пакет для сгенерированного класса определен в файле course.proto.
-Также скомпилировать прото-файл можно командой 'protoc --proto_path=src/main/resources --java_out=src/main/java course.proto', в которой в качестве первого аргумента указана директория, в которой расположен прото-файл, а в качестве второго - директория назначения для размещения сгенерированного класса. Здесь также пакет для сгенерированного класса берется из описания файла course.proto.
-##### 4. Описание зависимостей в проекте:
-implementation 'com.google.protobuf:protobuf-java:3.24.0' - нужна для работы с protobuf-объектами
-implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4' - нужна для работы с JSON-представлением protobuf-объектов.
-##### 5. Обратите внимание, что по умолчанию в контроллере объект сериализируется в формат application/x-protobuf (см. https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/http/converter/protobuf/ProtobufHttpMessageConverter.html). Для того, чтобы сериализовать объект в JSON, необходтмо зарегистрировать в качестве бина ProtobufHttpMessageConverter и добавить зависимость 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4', которая поддерживает сериализацию объекта в JSON. После этого в контроллере необходимо явно указать contentType.
+
+##### 1. Немного измените описание прото-файла для использования в качестве DTO. Обратите внимание, что изменены только имена полей, которые соответствуют именам полей POJO-классов.
+
+Также обратите внимание, что в enum PhoneTypeDto добавлено значение UNSPECIFIED. Это сделано для того, чтобы не
+допустить путаницы при ошибке передачи клиентом тела запроса. Например, раньше, если послать POST запрос с таким телом
+{
+"course_name": "REST with Spring",
+"students": [
+{
+"id": 1,
+"first_name": "John",
+"last_name": "Doe",
+"email": "johndoe@example.com",
+"phones": [
+{
+"number": "555-1234"
+}
+]
+},
+{
+"id": 2,
+"first_name": "Jane",
+"last_name": "Doe",
+"email": "janedoe@example.com",
+"phones": [
+{
+"number": "555-5678",
+"type": "LANDLINE"
+}
+]
+}
+]
+}
+у студента с id = 1 телефон по умолчанию будет установлен MOBILE (можете вернуться к этому моменту и убедиться). Теперь
+же, если не указать тип телефона, то будет брошено исключение (см. https://protobuf.dev/programming-guides/style/#enums)
+
+##### 2. Механизм компиляции и генерации классов на основе прото-файлов остался без изменений и описан в README.MD предыдущего коммита.
+
+##### 3. Обратите внимание на то, что в сгенерированных классах к именам полей в прото-файлах, представляющих собой колекции (в данном случае List), добавлены слова 'list' (students --> studentsList).
+
+##### 4. Обратите внимание на комментарии к коду, которые затрагивают нюансы работы сгенерированных классов с библиотекой MapStruct.
 
 
 

@@ -1,28 +1,47 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.2'
-	id 'io.spring.dependency-management' version '1.1.2'
+    id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
 }
 
 group = 'nkt.home'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation 'com.google.protobuf:protobuf-java:3.24.0' // нужна для работы с protobuf-объектами
-    implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4' // нужна для работы с JSON-представлением protobuf-объектов.
+    implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4'
+    // нужна для работы с JSON-представлением protobuf-объектов.
+
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    compileJava {
+        options.compilerArgs = [
+                '-Amapstruct.defaultComponentModel=spring'
+        ]
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

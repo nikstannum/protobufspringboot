@@ -2,12 +2,15 @@ package nkt.home.protobuf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nkt.home.protobuf.generated.CourseProto.Course;
-import nkt.home.protobuf.generated.CourseProto.Student;
 import nkt.home.protobuf.repository.CourseRepository;
+import nkt.home.protobuf.repository.entity.Course;
+import nkt.home.protobuf.repository.entity.PhoneNumber;
+import nkt.home.protobuf.repository.entity.PhoneNumber.PhoneType;
+import nkt.home.protobuf.repository.entity.Student;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +19,9 @@ import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 @SpringBootApplication
 public class ProtobufApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ProtobufApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ProtobufApplication.class, args);
+    }
 
     @Bean
     ProtobufHttpMessageConverter protobufHttpMessageConverter() {
@@ -28,15 +31,15 @@ public class ProtobufApplication {
     @Bean
     public CourseRepository createTestCourses() {
         Map<Integer, Course> courses = new HashMap<>();
-        Course course1 = Course.newBuilder()
-                .setId(1)
-                .setCourseName("REST with Spring")
-                .addAllStudent(createTestStudents())
+        Course course1 = Course.builder()
+                .id(1)
+                .courseName("REST with Spring")
+                .students(createTestStudents())
                 .build();
-        Course course2 = Course.newBuilder()
-                .setId(2)
-                .setCourseName("Learn Spring Security")
-                .addAllStudent(new ArrayList<>())
+        Course course2 = Course.builder()
+                .id(2)
+                .courseName("Learn Spring Security")
+                .students(new ArrayList<>())
                 .build();
         courses.put(course1.getId(), course1);
         courses.put(course2.getId(), course2);
@@ -45,23 +48,23 @@ public class ProtobufApplication {
 
     private List<Student> createTestStudents() {
         return Arrays.asList(
-                Student.newBuilder()
-                        .setId(1)
-                        .setFirstName("John")
-                        .setLastName("Doe")
-                        .setEmail("johndoe@example.com")
-                        .addPhone(Student.PhoneNumber.newBuilder()
-                                .setNumber("555-1234")
-                                .setType(Student.PhoneType.MOBILE))
+                Student.builder()
+                        .id(1)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("johndoe@example.com")
+                        .phones(Collections.singletonList(PhoneNumber.builder()
+                                .number("555-1234")
+                                .type(PhoneType.MOBILE).build()))
                         .build(),
-                Student.newBuilder()
-                        .setId(2)
-                        .setFirstName("Jane")
-                        .setLastName("Doe")
-                        .setEmail("janedoe@example.com")
-                        .addPhone(Student.PhoneNumber.newBuilder()
-                                .setNumber("555-5678")
-                                .setType(Student.PhoneType.LANDLINE))
+                Student.builder()
+                        .id(2)
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .email("janedoe@example.com")
+                        .phones(Collections.singletonList(PhoneNumber.builder()
+                                .number("555-5678")
+                                .type(PhoneType.LANDLINE).build()))
                         .build()
         );
     }
